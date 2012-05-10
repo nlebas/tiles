@@ -58,6 +58,7 @@
         <module>tiles-mvel</module>
         <module>tiles-ognl</module>
         <module>tiles-compat</module>
+        <module>tiles-spring</module>
         <module>tiles-extras</module>
         <module>assembly</module>
         <module>tiles-test-pom</module>
