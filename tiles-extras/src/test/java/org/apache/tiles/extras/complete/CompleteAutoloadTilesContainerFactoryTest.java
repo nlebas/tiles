@@ -27,6 +27,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -61,6 +62,8 @@ import org.apache.tiles.request.render.StringRenderer;
 import org.apache.tiles.request.servlet.ServletApplicationContext;
 import org.apache.tiles.request.velocity.render.VelocityRenderer;
 import org.apache.velocity.tools.view.VelocityView;
+import org.easymock.Capture;
+import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -113,18 +116,31 @@ public class CompleteAutoloadTilesContainerFactoryTest {
     public void testRegisterAttributeRenderers() {
         BasicRendererFactory rendererFactory = createMock(BasicRendererFactory.class);
         ServletApplicationContext applicationContext = createMock(ServletApplicationContext.class);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> applicationScope = (Map<String, Object>) createMock(Map.class);
         TilesContainer container = createMock(TilesContainer.class);
         AttributeEvaluatorFactory attributeEvaluatorFactory = createMock(AttributeEvaluatorFactory.class);
         ServletContext servletContext = createMock(ServletContext.class);
 
         rendererFactory.registerRenderer(eq("string"), isA(StringRenderer.class));
-        rendererFactory.registerRenderer(eq("template"), isA(DispatchRenderer.class));
+        rendererFactory.registerRenderer(eq("template"), isA(ChainedDelegateRenderer.class));
         rendererFactory.registerRenderer(eq("definition"), isA(DefinitionRenderer.class));
-        rendererFactory.registerRenderer(eq("freemarker"), isA(FreemarkerRenderer.class));
-        rendererFactory.registerRenderer(eq("velocity"), isA(VelocityRenderer.class));
-        rendererFactory.registerRenderer(eq("mustache"), isA(MustacheRenderer.class));
+        Capture<FreemarkerRenderer> freemarker = new Capture<FreemarkerRenderer>();
+        rendererFactory.registerRenderer(eq("freemarker"), and(isA(FreemarkerRenderer.class), capture(freemarker)));
+        expect(rendererFactory.getRenderer("freemarker")).andAnswer(new CapturedAnswer<Renderer>(freemarker));
+        Capture<VelocityRenderer> velocity = new Capture<VelocityRenderer>();
+        rendererFactory.registerRenderer(eq("velocity"), and(isA(VelocityRenderer.class), capture(velocity)));
+        expect(rendererFactory.getRenderer("velocity")).andAnswer(new CapturedAnswer<Renderer>(velocity));
+        Capture<MustacheRenderer> mustache = new Capture<MustacheRenderer>();
+        rendererFactory.registerRenderer(eq("mustache"), and(isA(MustacheRenderer.class), capture(mustache)));
+        expect(rendererFactory.getRenderer("mustache")).andAnswer(new CapturedAnswer<Renderer>(mustache));
+        Capture<DispatchRenderer> dispatch = new Capture<DispatchRenderer>();
+        rendererFactory.registerRenderer(eq("dispatch"), and(isA(DispatchRenderer.class), capture(dispatch)));
+        expect(rendererFactory.getRenderer("dispatch")).andAnswer(new CapturedAnswer<Renderer>(dispatch));
 
         expect(applicationContext.getContext()).andReturn(servletContext).anyTimes();
+        expect(applicationContext.getApplicationScope()).andReturn(applicationScope).anyTimes();
+        expect(applicationScope.get(FreemarkerRenderer.class.getName())).andReturn(null);
         expect(servletContext.getInitParameter(VelocityView.PROPERTIES_KEY)).andReturn(null);
         expect(servletContext.getInitParameter(VelocityView.TOOLS_KEY)).andReturn(null);
         expect(servletContext.getAttribute(VelocityView.TOOLS_KEY)).andReturn(null);
@@ -137,11 +153,12 @@ public class CompleteAutoloadTilesContainerFactoryTest {
         expect(servletContext.getResourceAsStream(VelocityView.DEPRECATED_USER_TOOLS_PATH)).andReturn(null);
         servletContext.log((String) anyObject());
         expectLastCall().anyTimes();
+        expect(applicationScope.put(eq(FreemarkerRenderer.class.getName()), isA(FreemarkerRenderer.class))).andReturn(null);
         expect(servletContext.getRealPath("/")).andReturn(null);
 
-        replay(rendererFactory, applicationContext, container, attributeEvaluatorFactory, servletContext);
+        replay(rendererFactory, applicationContext, container, attributeEvaluatorFactory, servletContext, applicationScope);
         factory.registerAttributeRenderers(rendererFactory, applicationContext, container, attributeEvaluatorFactory);
-        verify(rendererFactory, applicationContext, container, attributeEvaluatorFactory, servletContext);
+        verify(rendererFactory, applicationContext, container, attributeEvaluatorFactory, servletContext, applicationScope);
     }
 
     /**
@@ -150,27 +167,23 @@ public class CompleteAutoloadTilesContainerFactoryTest {
      * ApplicationContext, TilesContainer, AttributeEvaluatorFactory)}.
      */
     @Test
-    public void testCreateDefaultAttributeRenderer() {
+    public void testCreateTemplateAttributeRenderer() {
         ApplicationContext applicationContext = createMock(ApplicationContext.class);
         TilesContainer container = createMock(TilesContainer.class);
         AttributeEvaluatorFactory attributeEvaluatorFactory = createMock(AttributeEvaluatorFactory.class);
         BasicRendererFactory rendererFactory = createMock(BasicRendererFactory.class);
-        Renderer stringRenderer = createMock(Renderer.class);
-        Renderer templateRenderer = createMock(Renderer.class);
-        Renderer definitionRenderer = createMock(Renderer.class);
         Renderer velocityRenderer = createMock(Renderer.class);
         Renderer freemarkerRenderer = createMock(Renderer.class);
         Renderer mustacheRenderer = createMock(Renderer.class);
+        Renderer dispatchRenderer = createMock(Renderer.class);
 
-        expect(rendererFactory.getRenderer("string")).andReturn(stringRenderer);
-        expect(rendererFactory.getRenderer("template")).andReturn(templateRenderer);
-        expect(rendererFactory.getRenderer("definition")).andReturn(definitionRenderer);
         expect(rendererFactory.getRenderer("velocity")).andReturn(velocityRenderer);
         expect(rendererFactory.getRenderer("freemarker")).andReturn(freemarkerRenderer);
         expect(rendererFactory.getRenderer("mustache")).andReturn(mustacheRenderer);
+        expect(rendererFactory.getRenderer("dispatch")).andReturn(dispatchRenderer);
 
         replay(container, attributeEvaluatorFactory, rendererFactory, applicationContext);
-        Renderer renderer = factory.createDefaultAttributeRenderer(rendererFactory, applicationContext, container,
+        Renderer renderer = factory.createTemplateAttributeRenderer(rendererFactory, applicationContext, container,
                 attributeEvaluatorFactory);
         assertTrue("The default renderer class is not correct", renderer instanceof ChainedDelegateRenderer);
         verify(container, attributeEvaluatorFactory, rendererFactory, applicationContext);
@@ -330,4 +343,17 @@ public class CompleteAutoloadTilesContainerFactoryTest {
         verify(applicationContext);
     }
 
+    private static class CapturedAnswer<T> implements IAnswer<T> {
+        private Capture<? extends T> capture;
+
+        public CapturedAnswer(Capture<? extends T> capture) {
+            this.capture = capture;
+        }
+
+        @Override
+        public T answer() throws Throwable {
+            return capture.getValue();
+        }
+
+    }
 }

@@ -21,7 +21,6 @@
 
 package org.apache.tiles.extras.complete;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,7 +57,7 @@ import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
 import org.apache.tiles.evaluator.BasicAttributeEvaluatorFactory;
 import org.apache.tiles.factory.BasicTilesContainerFactory;
 import org.apache.tiles.factory.TilesContainerFactoryException;
-import org.apache.tiles.freemarker.TilesSharedVariableFactory;
+import org.apache.tiles.freemarker.template.TilesFMModelRepository;
 import org.apache.tiles.impl.mgmt.CachingTilesContainer;
 import org.apache.tiles.locale.LocaleResolver;
 import org.apache.tiles.mvel.MVELAttributeEvaluator;
@@ -76,17 +75,20 @@ import org.apache.tiles.ognl.TilesContextPropertyAccessorDelegateFactory;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
 import org.apache.tiles.request.Request;
+import org.apache.tiles.request.freemarker.RequestTemplateLoader;
 import org.apache.tiles.request.freemarker.render.FreemarkerRenderer;
-import org.apache.tiles.request.freemarker.render.FreemarkerRendererBuilder;
-import org.apache.tiles.request.freemarker.servlet.SharedVariableLoaderFreemarkerServlet;
 import org.apache.tiles.request.mustache.MustacheRenderer;
 import org.apache.tiles.request.render.BasicRendererFactory;
 import org.apache.tiles.request.render.ChainedDelegateRenderer;
 import org.apache.tiles.request.render.Renderer;
-import org.apache.tiles.request.servlet.ServletUtil;
 import org.apache.tiles.request.velocity.render.VelocityRenderer;
 import org.apache.tiles.request.velocity.render.VelocityRendererBuilder;
 import org.mvel2.integration.VariableResolverFactory;
+
+import freemarker.template.Configuration;
+import freemarker.template.ObjectWrapper;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 
 /**
  * Tiles container factory that:
@@ -132,24 +134,10 @@ public class CompleteAutoloadTilesContainerFactory extends BasicTilesContainerFa
 
     /** {@inheritDoc} */
     @Override
-    protected void registerAttributeRenderers(
-            final BasicRendererFactory rendererFactory,
-            final ApplicationContext applicationContext,
-            final TilesContainer container,
+    protected void registerAttributeRenderers(final BasicRendererFactory rendererFactory,
+            final ApplicationContext applicationContext, final TilesContainer container,
             final AttributeEvaluatorFactory attributeEvaluatorFactory) {
-        super.registerAttributeRenderers(rendererFactory, applicationContext, container, attributeEvaluatorFactory);
-
-        FreemarkerRenderer freemarkerRenderer = FreemarkerRendererBuilder
-                .createInstance()
-                .setApplicationContext(applicationContext)
-                .setParameter("TemplatePath", "/")
-                .setParameter("NoCache", "true")
-                .setParameter("ContentType", "text/html")
-                .setParameter("template_update_delay", "0")
-                .setParameter("default_encoding", "ISO-8859-1")
-                .setParameter("number_format", "0.##########")
-                .setParameter(SharedVariableLoaderFreemarkerServlet.CUSTOM_SHARED_VARIABLE_FACTORIES_INIT_PARAM,
-                        "tiles," + TilesSharedVariableFactory.class.getName()).build();
+        FreemarkerRenderer freemarkerRenderer = createFreemarkerRenderer(applicationContext);
         rendererFactory.registerRenderer(FREEMARKER_RENDERER_NAME, freemarkerRenderer);
 
         VelocityRenderer velocityRenderer = VelocityRendererBuilder.createInstance()
@@ -159,21 +147,44 @@ public class CompleteAutoloadTilesContainerFactory extends BasicTilesContainerFa
         MustacheRenderer mustacheRenderer = new MustacheRenderer();
         mustacheRenderer.setAcceptPattern(Pattern.compile(".+\\.mustache"));
         rendererFactory.registerRenderer(MUSTACHE_RENDERER_NAME, mustacheRenderer);
+
+        super.registerAttributeRenderers(rendererFactory, applicationContext, container, attributeEvaluatorFactory);
+    }
+
+    protected FreemarkerRenderer createFreemarkerRenderer(final ApplicationContext applicationContext) {
+        FreemarkerRenderer freemarkerRenderer = (FreemarkerRenderer) applicationContext.getApplicationScope().get(
+                FreemarkerRenderer.class.getName());
+        if (freemarkerRenderer == null) {
+            try {
+                Configuration config = new Configuration();
+                config.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+                config.setObjectWrapper(ObjectWrapper.DEFAULT_WRAPPER);
+                config.setTemplateLoader(new RequestTemplateLoader(applicationContext));
+                config.setDefaultEncoding("ISO-8859-1");
+                config.setTemplateUpdateDelay(0);
+                config.setSetting("number_format", "0.##########");
+                config.setSharedVariable("tiles", new TilesFMModelRepository());
+                freemarkerRenderer = new FreemarkerRenderer();
+                freemarkerRenderer.setConfiguration(config);
+                applicationContext.getApplicationScope().put(FreemarkerRenderer.class.getName(), freemarkerRenderer);
+            } catch (TemplateException e) {
+                throw new TilesContainerFactoryException("Cannot initialize Freemarker renderer", e);
+            }
+        }
+        return freemarkerRenderer;
     }
 
     /** {@inheritDoc} */
     @Override
-    protected Renderer createDefaultAttributeRenderer(BasicRendererFactory rendererFactory,
+    protected Renderer createTemplateAttributeRenderer(BasicRendererFactory rendererFactory,
             ApplicationContext applicationContext, TilesContainer container,
             AttributeEvaluatorFactory attributeEvaluatorFactory) {
-
         ChainedDelegateRenderer retValue = new ChainedDelegateRenderer();
-        retValue.addAttributeRenderer(rendererFactory.getRenderer(DEFINITION_RENDERER_NAME));
         retValue.addAttributeRenderer(rendererFactory.getRenderer(VELOCITY_RENDERER_NAME));
         retValue.addAttributeRenderer(rendererFactory.getRenderer(FREEMARKER_RENDERER_NAME));
         retValue.addAttributeRenderer(rendererFactory.getRenderer(MUSTACHE_RENDERER_NAME));
-        retValue.addAttributeRenderer(rendererFactory.getRenderer(TEMPLATE_RENDERER_NAME));
-        retValue.addAttributeRenderer(rendererFactory.getRenderer(STRING_RENDERER_NAME));
+        retValue.addAttributeRenderer(super.createTemplateAttributeRenderer(rendererFactory, applicationContext,
+                container, attributeEvaluatorFactory));
         return retValue;
     }
 

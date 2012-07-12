@@ -24,7 +24,7 @@
     <td  bgcolor="Blue"><strong>#tiles_insertAttribute({"name":"title", "defaultValue":"This is the default title."})#end</strong></td>
   </tr>
   <tr>
-    <td>#tiles_insertAttribute({"name":"header", "defaultValue":"alternate-header.vm", "defaultValueType":"template"})#end</td>
+    <td>#tiles_insertAttribute({"name":"header", "defaultValue":"/velocity/alternate-header.vm", "defaultValueType":"template"})#end</td>
   </tr>
   <tr>
     <td>#tiles_insertAttribute({"name":"body", "defaultValue":"This is the default body in the tag."})#end</td>

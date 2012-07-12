@@ -226,11 +226,12 @@ public class BasicTilesContainerFactoryTest extends TestCase {
         TilesContainer container = createMock(TilesContainer.class);
         AttributeEvaluatorFactory attributeEvaluatorFactory = createMock(AttributeEvaluatorFactory.class);
         BasicRendererFactory rendererFactory = createMock(BasicRendererFactory.class);
-
+        DispatchRenderer dispatchRenderer = createMock(DispatchRenderer.class);
+        expect(rendererFactory.getRenderer(BasicTilesContainerFactory.DISPATCH_RENDERER_NAME)).andReturn(dispatchRenderer);
         replay(container, attributeEvaluatorFactory, rendererFactory);
         Renderer renderer = factory.createTemplateAttributeRenderer(rendererFactory, applicationContext, container,
                 attributeEvaluatorFactory);
-        assertTrue("The renderer class is not correct", renderer instanceof DispatchRenderer);
+        assertSame("The renderer class is not correct", renderer, dispatchRenderer);
         verify(container, attributeEvaluatorFactory, rendererFactory);
     }
 

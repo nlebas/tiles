@@ -29,7 +29,7 @@
     <td  bgcolor="Blue"><strong><tiles:insertAttribute name="title" defaultValue="This is the default title."/></strong></td>
   </tr>
   <tr>
-    <td><tiles:insertAttribute name="header" defaultValue="alternate-header.jsp" defaultValueType="template"/></td>
+    <td><tiles:insertAttribute name="header" defaultValue="alternate-header.jsp" defaultValueType="dispatch"/></td>
   </tr>
   <tr>
     <td><tiles:insertAttribute name="body" defaultValue="This is the default body in the tag."/></td>

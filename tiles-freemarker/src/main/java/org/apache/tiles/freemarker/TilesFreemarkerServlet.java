@@ -18,28 +18,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.tiles.freemarker;
 
-import static org.junit.Assert.*;
+import javax.servlet.ServletException;
 
-import org.junit.Test;
+import org.apache.tiles.freemarker.template.TilesFMModelRepository;
+import org.apache.tiles.request.freemarker.servlet.RequestFreemarkerServlet;
 
-import freemarker.ext.beans.BeanModel;
+import freemarker.template.TemplateModelException;
 
 /**
- * Tests {@link SharedVariableFactory}.
  *
  * @version $Rev$ $Date$
+ * @since 3.0.0
  */
-public class TilesSharedVariableFactoryTest {
 
-    /**
-     * Test method for {@link org.apache.tiles.freemarker.TilesSharedVariableFactory#create()}.
-     */
-    @Test
-    public void testCreate() {
-        TilesSharedVariableFactory factory = new TilesSharedVariableFactory();
-        assertTrue(factory.create() instanceof BeanModel);
+public class TilesFreemarkerServlet extends RequestFreemarkerServlet {
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        try {
+            getConfiguration().setSharedVariable("tiles", new TilesFMModelRepository());
+        } catch (TemplateModelException e) {
+            throw new ServletException("Cannot setup the Tiles taglib", e);
+        }
     }
 
 }

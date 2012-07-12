@@ -75,6 +75,11 @@ public class BasicTilesContainerFactory extends AbstractTilesContainerFactory {
     protected static final String TEMPLATE_RENDERER_NAME = "template";
 
     /**
+     * The dispatch renderer name.
+     */
+    protected static final String DISPATCH_RENDERER_NAME = "dispatch";
+
+    /**
      * The definition renderer name.
      */
     protected static final String DEFINITION_RENDERER_NAME = "definition";
@@ -338,12 +343,33 @@ public class BasicTilesContainerFactory extends AbstractTilesContainerFactory {
         rendererFactory.registerRenderer(STRING_RENDERER_NAME,
                 createStringAttributeRenderer(rendererFactory,
                         applicationContext, container, attributeEvaluatorFactory));
+        rendererFactory.registerRenderer(DISPATCH_RENDERER_NAME,
+                createDispatchAttributeRenderer(rendererFactory,
+                        applicationContext, container, attributeEvaluatorFactory));
         rendererFactory.registerRenderer(TEMPLATE_RENDERER_NAME,
                 createTemplateAttributeRenderer(rendererFactory,
                         applicationContext, container, attributeEvaluatorFactory));
         rendererFactory.registerRenderer(DEFINITION_RENDERER_NAME,
                 createDefinitionAttributeRenderer(rendererFactory,
                         applicationContext, container, attributeEvaluatorFactory));
+    }
+
+    /**
+     * Creates an attribute renderer to render strings.
+     *
+     * @param rendererFactory The renderer factory to configure.
+     * @param applicationContext The Tiles application context.
+     * @param container The container.
+     * @param attributeEvaluatorFactory The attribute evaluator factory.
+     * @return The renderer.
+     * @since 3.1.0
+     */
+    private DispatchRenderer createDispatchAttributeRenderer(
+            BasicRendererFactory rendererFactory,
+            ApplicationContext applicationContext,
+            TilesContainer container,
+            AttributeEvaluatorFactory attributeEvaluatorFactory) {
+        return new DispatchRenderer();
     }
 
     /**
@@ -379,7 +405,7 @@ public class BasicTilesContainerFactory extends AbstractTilesContainerFactory {
             ApplicationContext applicationContext,
             TilesContainer container,
             AttributeEvaluatorFactory attributeEvaluatorFactory) {
-        return new DispatchRenderer();
+        return rendererFactory.getRenderer(DISPATCH_RENDERER_NAME);
     }
 
     /**
