@@ -103,7 +103,9 @@ import org.mvel2.integration.VariableResolverFactory;
  *
  * @version $Rev$ $Date$
  * @since 2.2.0
+ * @deprecated use CompleteAutoloadTilesInitializer instead.
  */
+@Deprecated
 public class CompleteAutoloadTilesContainerFactory extends BasicTilesContainerFactory {
 
     /**

@@ -151,7 +151,7 @@
                           <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                       </manifest>
                       <manifestEntries>
-                          <Tiles-Initializer>org.apache.tiles.test.init.TestTilesInitializer</Tiles-Initializer>
+                          <Tiles-Initializer>org.apache.tiles.test.factory.TestTilesInitializer</Tiles-Initializer>
                       </manifestEntries>
                   </archive>
                </configuration>

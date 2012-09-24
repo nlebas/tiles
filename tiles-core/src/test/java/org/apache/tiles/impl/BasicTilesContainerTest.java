@@ -23,16 +23,19 @@ package org.apache.tiles.impl;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.HashMap;
 
 import junit.framework.TestCase;
 
 import org.apache.tiles.Attribute;
-import org.apache.tiles.factory.AbstractTilesContainerFactory;
-import org.apache.tiles.factory.BasicTilesContainerFactory;
+import org.apache.tiles.TilesContainer;
+import org.apache.tiles.TilesContainerWrapper;
+import org.apache.tiles.access.TilesAccess;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.Request;
 import org.apache.tiles.request.locale.URLApplicationResource;
 import org.apache.tiles.request.render.CannotRenderException;
+import org.apache.tiles.startup.DefaultTilesInitializer;
 import org.easymock.EasyMock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +67,20 @@ public class BasicTilesContainerTest extends TestCase {
     public void setUp() {
         ApplicationContext context = EasyMock
                 .createMock(ApplicationContext.class);
+        EasyMock.expect(context.getApplicationScope()).andStubReturn(new HashMap<String, Object>());
         URL url = getClass().getResource("/org/apache/tiles/factory/test-defs.xml");
         URLApplicationResource resource = new URLApplicationResource("/WEB-INF/tiles.xml", url);
 
         EasyMock.expect(context.getResource("/WEB-INF/tiles.xml"))
                 .andReturn(resource);
         EasyMock.replay(context);
-        AbstractTilesContainerFactory factory = new BasicTilesContainerFactory();
-        container = (BasicTilesContainer) factory.createContainer(context);
+        DefaultTilesInitializer initializer = new DefaultTilesInitializer();
+        initializer.initialize(context);
+        TilesContainer tilesContainer = TilesAccess.getContainer(context);
+        while(tilesContainer instanceof TilesContainerWrapper) {
+            tilesContainer = ((TilesContainerWrapper)tilesContainer).getWrappedContainer();
+        }
+        container = (BasicTilesContainer)tilesContainer;
     }
 
     /**

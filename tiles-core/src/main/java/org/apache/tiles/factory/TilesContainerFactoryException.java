@@ -27,7 +27,9 @@ import org.apache.tiles.TilesException;
  *
  * @version $Rev$ $Date$
  * @since 2.1.0
+ * @deprecated use {@link org.apache.tiles.startup.TilesInitializerException} instead
  */
+@Deprecated
 public class TilesContainerFactoryException extends TilesException {
 
     /**

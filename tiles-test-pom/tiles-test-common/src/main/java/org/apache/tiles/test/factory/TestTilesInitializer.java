@@ -18,39 +18,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.tiles.test.factory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tiles.TilesContainer;
-import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
-import org.apache.tiles.extras.complete.CompleteAutoloadTilesContainerFactory;
+import javax.servlet.ServletContext;
+
+import org.apache.tiles.extras.complete.CompleteAutoloadTilesInitializer;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
-import org.apache.tiles.request.render.BasicRendererFactory;
+import org.apache.tiles.request.render.Renderer;
+import org.apache.tiles.request.servlet.wildcard.WildcardServletApplicationContext;
 import org.apache.tiles.test.renderer.ReverseStringRenderer;
 
-
 /**
- * Test Tiles container factory to customize Tiles behaviour.
+ * Test Tiles initializer for Tiles initialization of the default container.
  *
  * @version $Rev$ $Date$
  */
-public class TestTilesContainerFactory extends CompleteAutoloadTilesContainerFactory {
-
-    /** {@inheritDoc} */
-    @Override
-    protected void registerAttributeRenderers(
-            BasicRendererFactory rendererFactory,
-            ApplicationContext applicationContext,
-            TilesContainer container,
-            AttributeEvaluatorFactory attributeEvaluatorFactory) {
-        super.registerAttributeRenderers(rendererFactory, applicationContext, container,
-                attributeEvaluatorFactory);
-        ReverseStringRenderer renderer = new ReverseStringRenderer();
-        rendererFactory.registerRenderer("reversed", renderer);
-    }
+public class TestTilesInitializer extends CompleteAutoloadTilesInitializer {
 
     /** {@inheritDoc} */
     @Override
@@ -65,5 +53,34 @@ public class TestTilesContainerFactory extends CompleteAutoloadTilesContainerFac
         urls.add(applicationContext.getResource(
             "classpath:/org/apache/tiles/velocity-classpath-defs.xml"));
         return urls;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    protected ApplicationContext createTilesApplicationContext(
+            ApplicationContext preliminaryContext) {
+        return new WildcardServletApplicationContext(
+                (ServletContext) preliminaryContext.getContext());
+    }
+
+    @Override
+    protected List<String> getRendererNames(ApplicationContext applicationContext) {
+        ArrayList<String> renderers = new ArrayList<String>();
+        renderers.addAll(super.getRendererNames(applicationContext));
+        renderers.add("reversed");
+        return renderers;
+    }
+
+    @Override
+    protected List<String> getTemplateNames(ApplicationContext applicationContext) {
+        return super.getRendererNames(applicationContext);
+    }
+
+    @Override
+    protected Renderer getRenderer(ApplicationContext applicationContext, String name) {
+        if("reversed".equals(name)) {
+            return new ReverseStringRenderer();
+        }
+        return super.getRenderer(applicationContext, name);
     }
 }

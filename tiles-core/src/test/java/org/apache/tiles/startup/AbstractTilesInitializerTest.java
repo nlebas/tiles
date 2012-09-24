@@ -24,13 +24,24 @@ package org.apache.tiles.startup;
 import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.tiles.Definition;
 import org.apache.tiles.TilesContainer;
 import org.apache.tiles.access.TilesAccess;
-import org.apache.tiles.factory.AbstractTilesContainerFactory;
+import org.apache.tiles.definition.DefinitionsFactory;
+import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
+import org.apache.tiles.preparer.ViewPreparer;
+import org.apache.tiles.preparer.factory.PreparerFactory;
 import org.apache.tiles.request.ApplicationAccess;
 import org.apache.tiles.request.ApplicationContext;
+import org.apache.tiles.request.Request;
+import org.apache.tiles.request.render.Renderer;
+import org.easymock.Capture;
+import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,88 +53,155 @@ import org.junit.Test;
 public class AbstractTilesInitializerTest {
 
     /**
-     * A mock Tiles container factory.
+     * The ApplicationContext.
      */
-    private AbstractTilesContainerFactory containerFactory;
-
+    private ApplicationContext applicationContext;
+    
+    /**
+     * The Application scope.
+     */
+    private Map<String, Object> applicationScope;
+    
+    /**
+     * The AttributeEvaluatorFactory.
+     */
+    private AttributeEvaluatorFactory attributeEvaluatorFactory;
+    
+    /**
+     * The DefinitionsFactory.
+     */
+    private DefinitionsFactory definitionsFactory;
+    
+    /**
+     * The PreparerFactory.
+     */
+    private PreparerFactory preparerFactory;
+    
+    /**
+     * A renderer.
+     */
+    private Renderer renderer1;
+    
+    /**
+     * Another renderer.
+     */
+    private Renderer renderer2;
+    
+    
     /**
      * The object to test.
      */
     private AbstractTilesInitializer initializer;
 
     /**
+     * The tiles container.
+     */
+    private IAnswer<TilesContainer> tilesContainerAnswer;
+    
+    /**
      * Sets up the test.
      */
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() {
-        containerFactory = createMock(AbstractTilesContainerFactory.class);
+        applicationContext = createMock(ApplicationContext.class);
+        applicationScope = createMock(Map.class);
+        expect(applicationContext.getApplicationScope()).andStubReturn(applicationScope);
+        expect(applicationScope.put(ApplicationAccess.APPLICATION_CONTEXT_ATTRIBUTE, applicationContext)).andReturn(null);
+        final Capture<TilesContainer> tilesContainerCapture = new Capture<TilesContainer>();        
+        tilesContainerAnswer = new IAnswer<TilesContainer>() {
+
+            @Override
+            public TilesContainer answer() throws Throwable {
+                return tilesContainerCapture.getValue();
+            }
+        };
+        expect(applicationScope.put(eq(TilesAccess.CONTAINER_ATTRIBUTE), capture(tilesContainerCapture))).andReturn(null);
+        expect(applicationScope.get(TilesAccess.CONTAINER_ATTRIBUTE)).andStubAnswer(tilesContainerAnswer);
+        attributeEvaluatorFactory = createMock(AttributeEvaluatorFactory.class);
+        definitionsFactory = createMock(DefinitionsFactory.class);
+        preparerFactory = createMock(PreparerFactory.class);
         initializer = new AbstractTilesInitializer() {
 
             @Override
-            protected AbstractTilesContainerFactory createContainerFactory(
-                    ApplicationContext context) {
-                return containerFactory;
+            protected AttributeEvaluatorFactory createAttributeEvaluatorFactory(ApplicationContext applicationContext) {
+                return attributeEvaluatorFactory;
             }
+
+            @Override
+            protected DefinitionsFactory createDefinitionsFactory(ApplicationContext applicationContext) {
+                return definitionsFactory;
+            }
+
+            @Override
+            protected PreparerFactory createPreparerFactory(ApplicationContext applicationContext) {
+                return preparerFactory;
+            }
+
+            @Override
+            protected List<String> getRendererNames(ApplicationContext applicationContext) {
+                return Arrays.asList("test1", "test2");
+            }
+
+            @Override
+            protected Renderer getRenderer(ApplicationContext applicationContext, String name) {
+                if("test1".equals(name)) return renderer1;
+                else if("test2".equals(name)) return renderer2;
+                else throw new IllegalArgumentException("Unknown renderer");
+            }
+            
         };
     }
 
     /**
      * Test method for {@link AbstractTilesInitializer#initialize(ApplicationContext)}.
      */
-    @SuppressWarnings("unchecked")
     @Test
     public void testInitialize() {
-        ApplicationContext context = createMock(ApplicationContext.class);
-        TilesContainer container = createMock(TilesContainer.class);
-        Map<String, Object> scope = createMock(Map.class);
+        replay(applicationContext, applicationScope, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+        initializer.initialize(applicationContext);
+        verify(applicationContext, applicationScope, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+    }
 
-        expect(containerFactory.createContainer(context)).andReturn(container);
-        expect(context.getApplicationScope()).andReturn(scope).anyTimes();
-        expect(scope.put(ApplicationAccess.APPLICATION_CONTEXT_ATTRIBUTE,
-                context)).andReturn(null);
-        expect(scope.put(TilesAccess.CONTAINER_ATTRIBUTE, container)).andReturn(null);
-        expect(scope.remove(TilesAccess.CONTAINER_ATTRIBUTE)).andReturn(container);
+    /**
+     * Test method for {@link AbstractTilesInitializer#initialize(ApplicationContext)}.
+     */
+    @Test
+    public void testContainerGetDefinition() throws Throwable {
+        Request request = createMock(Request.class);
+        expect(request.getContext("request")).andStubReturn(new HashMap<String, Object>());
+        Definition definition = createMock(Definition.class);
+        expect(definitionsFactory.getDefinition("testDefinition", request)).andReturn(definition);
+        replay(applicationContext, applicationScope, request, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+        initializer.initialize(applicationContext);
+        assertSame(definition, tilesContainerAnswer.answer().getDefinition("testDefinition", request));
+        verify(applicationContext, applicationScope, request, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+    }
 
-        replay(containerFactory, context, container, scope);
-        initializer.initialize(context);
+    /**
+     * Test method for {@link AbstractTilesInitializer#initialize(ApplicationContext)}.
+     */
+    @Test
+    public void testContainerPrepare() throws Throwable {
+        Request request = createMock(Request.class);
+        expect(request.getContext("request")).andStubReturn(new HashMap<String, Object>());
+        ViewPreparer preparer = createMock(ViewPreparer.class);
+        expect(preparerFactory.getPreparer("testPreparer", request)).andReturn(preparer);
+        replay(applicationContext, applicationScope, request, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+        initializer.initialize(applicationContext);
+        tilesContainerAnswer.answer().prepare("testPreparer", request);
+        verify(applicationContext, applicationScope, request, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+    }
+
+    /**
+     * Test method for {@link AbstractTilesInitializer#initialize(ApplicationContext)}.
+     */
+    @Test
+    public void testDestroy() {
+        expect(applicationScope.remove(TilesAccess.CONTAINER_ATTRIBUTE)).andAnswer(tilesContainerAnswer);
+        replay(applicationContext, applicationScope, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
+        initializer.initialize(applicationContext);
         initializer.destroy();
-        verify(containerFactory, context, container, scope);
-    }
-
-    /**
-     * Test method for {@link AbstractTilesInitializer#createTilesApplicationContext(ApplicationContext)}.
-     */
-    @Test
-    public void testCreateTilesApplicationContext() {
-        ApplicationContext context = createMock(ApplicationContext.class);
-        replay(containerFactory, context);
-        assertEquals(context, initializer.createTilesApplicationContext(context));
-        verify(containerFactory, context);
-    }
-
-    /**
-     * Test method for {@link AbstractTilesInitializer#getContainerKey(ApplicationContext)}.
-     */
-    @Test
-    public void testGetContainerKey() {
-        ApplicationContext context = createMock(ApplicationContext.class);
-        replay(containerFactory, context);
-        assertNull(initializer.getContainerKey(context));
-        verify(containerFactory, context);
-    }
-
-    /**
-     * Test method for {@link AbstractTilesInitializer#createContainer(ApplicationContext)}.
-     */
-    @Test
-    public void testCreateContainer() {
-        ApplicationContext context = createMock(ApplicationContext.class);
-        TilesContainer container = createMock(TilesContainer.class);
-
-        expect(containerFactory.createContainer(context)).andReturn(container);
-
-        replay(containerFactory, context, container);
-        assertEquals(container, initializer.createContainer(context));
-        verify(containerFactory, context, container);
+        verify(applicationContext, applicationScope, attributeEvaluatorFactory, definitionsFactory, preparerFactory);
     }
 }
