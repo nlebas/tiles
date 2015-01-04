@@ -59,7 +59,7 @@ public abstract class AbstractTilesInitializer implements TilesInitializer {
     /** {@inheritDoc} */
     public void initialize(ApplicationContext applicationContext) {
         this.applicationContext = createTilesApplicationContext(applicationContext);
-        ApplicationAccess.register(applicationContext);
+        ApplicationAccess.register(this.applicationContext);
         String key = getContainerKey(this.applicationContext);
         container = createContainer(this.applicationContext);
         TilesAccess.setContainer(this.applicationContext, container, key);

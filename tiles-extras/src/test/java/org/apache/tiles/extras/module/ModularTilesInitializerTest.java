@@ -30,6 +30,7 @@ import java.net.URL;
 import javax.servlet.ServletContext;
 
 import org.apache.tiles.request.ApplicationContext;
+import org.apache.tiles.request.locale.URLApplicationResource;
 import org.apache.tiles.startup.TilesInitializer;
 import org.junit.Test;
 
@@ -49,13 +50,10 @@ public class ModularTilesInitializerTest {
     @Test
     public void testInitialize() throws MalformedURLException {
         ApplicationContext preliminaryContext = createMock(ApplicationContext.class);
-        ServletContext servletContext = createMock(ServletContext.class);
         URL manifestUrl = getClass().getResource("/FAKE-MANIFEST.MF");
+        expect(preliminaryContext.getResource("/META-INF/MANIFEST.MF")).andReturn(new URLApplicationResource("/META-INF/MANIFEST.MF", manifestUrl));
 
-        expect(preliminaryContext.getContext()).andReturn(servletContext);
-        expect(servletContext.getResource("/META-INF/MANIFEST.MF")).andReturn(manifestUrl);
-
-        replay(preliminaryContext, servletContext);
+        replay(preliminaryContext);
         ModularTilesInitializer initializer = new ModularTilesInitializer();
         initializer.initialize(preliminaryContext);
         assertTrue(TilesInitializer1.initialized);
@@ -63,7 +61,7 @@ public class ModularTilesInitializerTest {
         initializer.destroy();
         assertTrue(TilesInitializer1.destroyed);
         assertTrue(TilesInitializer2.destroyed);
-        verify(preliminaryContext, servletContext);
+        verify(preliminaryContext);
     }
 
     /**

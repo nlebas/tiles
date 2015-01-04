@@ -23,19 +23,17 @@ package org.apache.tiles.extras.module;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
-import javax.servlet.ServletContext;
 
 import org.apache.tiles.definition.DefinitionsFactoryException;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
 import org.apache.tiles.request.reflect.ClassUtil;
-import org.apache.tiles.request.servlet.wildcard.WildcardServletApplicationContext;
 import org.apache.tiles.startup.TilesInitializer;
 
 /**
@@ -57,9 +55,7 @@ public class ModularTilesInitializer implements TilesInitializer {
 
     /** {@inheritDoc} */
     public void initialize(ApplicationContext preliminaryContext) {
-        ApplicationContext applicationContext = new WildcardServletApplicationContext(
-                (ServletContext) preliminaryContext.getContext());
-        loadInitializers(applicationContext);
+        loadInitializers(preliminaryContext);
 
         for (TilesInitializer initializer : initializers) {
             initializer.initialize(preliminaryContext);
@@ -81,31 +77,39 @@ public class ModularTilesInitializer implements TilesInitializer {
     private void loadInitializers(ApplicationContext applicationContext) {
         initializers = new ArrayList<TilesInitializer>();
         try {
-            Collection<ApplicationResource> resources = applicationContext
-                    .getResources("classpath*:META-INF/MANIFEST.MF");
+            Enumeration<URL> manifests = Thread.currentThread().getContextClassLoader().getResources("META-INF/MANIFEST.MF");
+            while(manifests.hasMoreElements()) {
+                InputStream stream = manifests.nextElement().openStream();
+                try {
+                    lookupTilesInitializer(stream);
+                } finally {
+                    stream.close();
+                }
+            }
             ApplicationResource mainResource = applicationContext.getResource("/META-INF/MANIFEST.MF");
             if (mainResource != null) {
-                resources.add(mainResource);
-            }
-            for (ApplicationResource resource : resources) {
-                InputStream stream = resource.getInputStream();
+                InputStream stream = mainResource.getInputStream();
                 try {
-                    Manifest manifest = new Manifest(stream);
-                    Attributes attributes = manifest.getMainAttributes();
-                    if (attributes != null) {
-                        String initializerName = attributes.getValue("Tiles-Initializer");
-                        if (initializerName != null) {
-                            TilesInitializer initializer = (TilesInitializer) ClassUtil
-                                    .instantiate(initializerName);
-                            initializers.add(initializer);
-                        }
-                    }
+                    lookupTilesInitializer(stream);
                 } finally {
                     stream.close();
                 }
             }
         } catch (IOException e) {
             throw new DefinitionsFactoryException("Error getting manifest files", e);
+        }
+    }
+
+    private void lookupTilesInitializer(InputStream stream) throws IOException {
+        Manifest manifest = new Manifest(stream);
+        Attributes attributes = manifest.getMainAttributes();
+        if (attributes != null) {
+            String initializerName = attributes.getValue("Tiles-Initializer");
+            if (initializerName != null) {
+                TilesInitializer initializer = (TilesInitializer) ClassUtil
+                        .instantiate(initializerName);
+                initializers.add(initializer);
+            }
         }
     }
 }
