@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!--
 /*
  * $Id$
  *
@@ -20,18 +18,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
--->
 
-<!DOCTYPE tiles-definitions PUBLIC
-    "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
-    "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+package org.apache.tiles.test.guice;
 
-<!-- Definitions for Tiles documentation   -->
+import javax.el.ExpressionFactory;
 
-<tiles-definitions>
-    <definition name="freemarker.classpath.definition" template="/ftl/layout.ftl">
-        <put-attribute name="title" value="This is the title."/>
-        <put-attribute name="header" value="/ftl/header.ftl"/>
-        <put-attribute name="body" value="/ftl/classpath.ftl"/>
-    </definition>
-</tiles-definitions>
+import org.apache.el.ExpressionFactoryImpl;
+import org.apache.tiles.el.ExpressionFactoryFactory;
+
+/**
+ *
+ * @version $Rev$ $Date$
+ * @since 3.0.0
+ */
+
+public class JasperExpressionFactoryFactory implements ExpressionFactoryFactory {
+
+    /** {@inheritDoc} */
+    @Override
+    public ExpressionFactory getExpressionFactory() {
+        return new ExpressionFactoryImpl();
+    }
+
+}

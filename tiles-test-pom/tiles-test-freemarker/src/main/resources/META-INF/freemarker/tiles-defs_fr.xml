@@ -22,16 +22,17 @@
  */
 -->
 
-<!DOCTYPE tiles-definitions PUBLIC
-    "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
-    "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+ <!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 
 <!-- Definitions for Tiles documentation   -->
 
 <tiles-definitions>
-    <definition name="freemarker.classpath.definition" template="/ftl/layout.ftl">
-        <put-attribute name="title" value="This is the title."/>
-        <put-attribute name="header" value="/ftl/header.ftl"/>
-        <put-attribute name="body" value="/ftl/classpath.ftl"/>
-    </definition>
+  <definition name="freemarker.test.localized.definition" template="/ftl/layout.ftl">
+      <put-attribute name="title" value="French locale" />
+      <put-attribute name="header" value="/ftl/header.ftl" />
+      <put-attribute name="body" value="/ftl/defaultlocale.ftl" />
+  </definition>
+
 </tiles-definitions>

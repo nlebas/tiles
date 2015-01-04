@@ -62,7 +62,7 @@
 
     <filter-mapping>
         <filter-name>Tiles Decoration Filter</filter-name>
-        <url-pattern>/freemarker/testdecorationfilter.ftl</url-pattern>
+        <url-pattern>/ftl/testdecorationfilter.ftl</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
@@ -216,7 +216,7 @@
 
     <servlet-mapping>
         <servlet-name>selectLocaleServletFreemarker</servlet-name>
-        <url-pattern>/freemarker/servlets/selectLocaleServlet</url-pattern>
+        <url-pattern>/ftl/servlets/selectLocaleServlet</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

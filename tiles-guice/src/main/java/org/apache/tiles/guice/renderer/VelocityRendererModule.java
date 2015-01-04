@@ -23,10 +23,10 @@ package org.apache.tiles.guice.renderer;
 
 import java.util.Properties;
 
-import org.apache.tiles.factory.TilesContainerFactoryException;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.render.Renderer;
 import org.apache.tiles.request.velocity.render.VelocityToolsRenderer;
+import org.apache.tiles.startup.TilesInitializerException;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.google.inject.AbstractModule;
@@ -73,7 +73,7 @@ public class VelocityRendererModule extends AbstractModule {
             velocityProperties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/velocity.properties"));
             return new VelocityEngine(velocityProperties);
         } catch (Exception e) {
-            throw new TilesContainerFactoryException("Cannot initialize Velocity renderer", e);
+            throw new TilesInitializerException("Cannot initialize Velocity renderer", e);
         }
     }
 }

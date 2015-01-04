@@ -50,6 +50,8 @@ public class TestTilesInitializer extends CompleteAutoloadTilesInitializer {
         List<ApplicationResource> urls = new ArrayList<ApplicationResource>();
         urls.addAll(applicationContext
                 .getResources("/WEB-INF/**/tiles-defs*.xml"));
+        urls.addAll(applicationContext
+                .getResources("classpath*:/META-INF/**/tiles-defs*.xml"));
         urls.add(applicationContext.getResource(
                 "classpath:/org/apache/tiles/classpath-defs.xml"));
         urls.add(applicationContext.getResource(

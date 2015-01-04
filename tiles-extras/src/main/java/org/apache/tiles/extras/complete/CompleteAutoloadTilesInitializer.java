@@ -55,7 +55,7 @@ import org.apache.tiles.el.TilesContextBeanELResolver;
 import org.apache.tiles.el.TilesContextELResolver;
 import org.apache.tiles.evaluator.AttributeEvaluatorFactory;
 import org.apache.tiles.evaluator.BasicAttributeEvaluatorFactory;
-import org.apache.tiles.freemarker.TilesSharedVariableFactory;
+import org.apache.tiles.freemarker.template.TilesFMModelRepository;
 import org.apache.tiles.mvel.MVELAttributeEvaluator;
 import org.apache.tiles.mvel.ScopeVariableResolverFactory;
 import org.apache.tiles.mvel.TilesContextBeanVariableResolverFactory;
@@ -72,7 +72,8 @@ import org.apache.tiles.request.AbstractApplicationContext;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
 import org.apache.tiles.request.Request;
-import org.apache.tiles.request.freemarker.render.FreemarkerRendererBuilder;
+import org.apache.tiles.request.freemarker.RequestTemplateLoader;
+import org.apache.tiles.request.freemarker.render.FreemarkerRenderer;
 import org.apache.tiles.request.freemarker.servlet.SharedVariableLoaderFreemarkerServlet;
 import org.apache.tiles.request.mustache.MustacheRenderer;
 import org.apache.tiles.request.render.Renderer;
@@ -83,6 +84,11 @@ import org.apache.tiles.startup.DefaultTilesInitializer;
 import org.apache.tiles.startup.TilesInitializerException;
 import org.mvel2.integration.VariableResolverFactory;
 import org.springframework.web.context.support.ServletContextResourcePatternResolver;
+
+import freemarker.template.Configuration;
+import freemarker.template.ObjectWrapper;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 
 /**
  * This initializer uses {@link WildcardServletApplicationContext} to
@@ -234,17 +240,21 @@ public class CompleteAutoloadTilesInitializer extends DefaultTilesInitializer {
     @Override
     protected Renderer getRenderer(ApplicationContext applicationContext, String name) {
         if (FREEMARKER_RENDERER_NAME.equals(name)) {
-            return FreemarkerRendererBuilder
-                    .createInstance()
-                    .setApplicationContext(applicationContext)
-                    .setParameter("TemplatePath", "/")
-                    .setParameter("NoCache", "true")
-                    .setParameter("ContentType", "text/html")
-                    .setParameter("template_update_delay", "0")
-                    .setParameter("default_encoding", "ISO-8859-1")
-                    .setParameter("number_format", "0.##########")
-                    .setParameter(SharedVariableLoaderFreemarkerServlet.CUSTOM_SHARED_VARIABLE_FACTORIES_INIT_PARAM,
-                            "tiles," + TilesSharedVariableFactory.class.getName()).build();
+            try {
+                Configuration config = new Configuration();
+                config.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+                config.setObjectWrapper(ObjectWrapper.DEFAULT_WRAPPER);
+                config.setTemplateLoader(new RequestTemplateLoader(applicationContext));
+                config.setDefaultEncoding("ISO-8859-1");
+                config.setTemplateUpdateDelay(0);
+                config.setSetting("number_format", "0.##########");
+                config.setSharedVariable("tiles", new TilesFMModelRepository());
+                FreemarkerRenderer freemarkerRenderer = new FreemarkerRenderer();
+                freemarkerRenderer.setConfiguration(config);
+                return freemarkerRenderer;
+            } catch (TemplateException e) {
+                throw new TilesInitializerException("Cannot initialize Freemarker renderer", e);
+            }
         } else if (VELOCITY_RENDERER_NAME.equals(name)) {
             return VelocityRendererBuilder.createInstance().setApplicationContext(applicationContext).build();
         } else if (MUSTACHE_RENDERER_NAME.equals(name)) {

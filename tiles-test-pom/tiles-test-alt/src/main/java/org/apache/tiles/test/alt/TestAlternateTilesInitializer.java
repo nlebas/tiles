@@ -32,6 +32,7 @@ import org.apache.tiles.definition.dao.DefinitionDAO;
 import org.apache.tiles.request.AbstractApplicationContext;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
+import org.apache.tiles.request.locale.ClasspathResourceLocator;
 import org.apache.tiles.request.servlet.ServletApplicationContext;
 import org.apache.tiles.request.spring.SpringResourceLocator;
 import org.apache.tiles.test.factory.TestTilesInitializer;
@@ -74,15 +75,5 @@ public class TestAlternateTilesInitializer extends TestTilesInitializer {
     protected String getContainerKey(
             ApplicationContext applicationContext) {
         return "alternate";
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    protected ApplicationContext createTilesApplicationContext(
-            ApplicationContext preliminaryContext) {
-        ServletContext servletContext = (ServletContext) preliminaryContext.getContext();
-        AbstractApplicationContext result = new ServletApplicationContext(servletContext);
-        result.register(new SpringResourceLocator(new ServletContextResourcePatternResolver(servletContext)));
-        return result;
     }
 }

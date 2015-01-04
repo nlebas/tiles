@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!--
+<#--
 /*
  * $Id$
  *
@@ -19,19 +18,17 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
  */
 -->
-
-<!DOCTYPE tiles-definitions PUBLIC
-    "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
-    "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
-
-<!-- Definitions for Tiles documentation   -->
-
-<tiles-definitions>
-    <definition name="freemarker.classpath.definition" template="/ftl/layout.ftl">
-        <put-attribute name="title" value="This is the title."/>
-        <put-attribute name="header" value="/ftl/header.ftl"/>
-        <put-attribute name="body" value="/ftl/classpath.ftl"/>
-    </definition>
-</tiles-definitions>
+<@tiles.definition name="test.inner.definition.tags" template="/ftl/layout.ftl">
+    <@tiles.putAttribute name="title"  value="This is an inner definition with tags."/>
+    <@tiles.putAttribute name="header" value="/ftl/header.ftl"/>
+    <@tiles.putAttribute name="body"   value="/ftl/body.ftl"/>
+</@tiles.definition>
+<@tiles.definition name="test.composite.definition.tags" template="/ftl/layout.ftl">
+    <@tiles.putAttribute name="title"  value="This is a composite definition with tags."/>
+    <@tiles.putAttribute name="header" value="/ftl/header.ftl"/>
+    <@tiles.putAttribute name="body"   value="test.inner.definition.tags"/>
+</@tiles.definition>
+<@tiles.insertDefinition name="test.composite.definition.tags" />

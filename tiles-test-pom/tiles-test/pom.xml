@@ -54,6 +54,11 @@
       </dependency>
       <dependency>
          <groupId>org.apache.tiles</groupId>
+         <artifactId>tiles-test-freemarker</artifactId>
+         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.tiles</groupId>
          <artifactId>tiles-extras</artifactId>
          <version>${project.version}</version>
       </dependency>
