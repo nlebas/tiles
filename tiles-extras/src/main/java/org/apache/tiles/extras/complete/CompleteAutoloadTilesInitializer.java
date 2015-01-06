@@ -68,6 +68,7 @@ import org.apache.tiles.ognl.PropertyAccessorDelegateFactory;
 import org.apache.tiles.ognl.ScopePropertyAccessor;
 import org.apache.tiles.ognl.TilesApplicationContextNestedObjectExtractor;
 import org.apache.tiles.ognl.TilesContextPropertyAccessorDelegateFactory;
+import org.apache.tiles.request.AbstractApplicationContext;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
 import org.apache.tiles.request.Request;
@@ -75,11 +76,13 @@ import org.apache.tiles.request.freemarker.render.FreemarkerRendererBuilder;
 import org.apache.tiles.request.freemarker.servlet.SharedVariableLoaderFreemarkerServlet;
 import org.apache.tiles.request.mustache.MustacheRenderer;
 import org.apache.tiles.request.render.Renderer;
-import org.apache.tiles.request.servlet.wildcard.WildcardServletApplicationContext;
+import org.apache.tiles.request.servlet.ServletApplicationContext;
+import org.apache.tiles.request.spring.SpringResourceLocator;
 import org.apache.tiles.request.velocity.render.VelocityRendererBuilder;
 import org.apache.tiles.startup.DefaultTilesInitializer;
 import org.apache.tiles.startup.TilesInitializerException;
 import org.mvel2.integration.VariableResolverFactory;
+import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 
 /**
  * This initializer uses {@link WildcardServletApplicationContext} to
@@ -256,7 +259,10 @@ public class CompleteAutoloadTilesInitializer extends DefaultTilesInitializer {
     /** {@inheritDoc} */
     @Override
     protected ApplicationContext createTilesApplicationContext(ApplicationContext preliminaryContext) {
-        return new WildcardServletApplicationContext((ServletContext) preliminaryContext.getContext());
+    	ServletContext servletContext = (ServletContext) preliminaryContext.getContext();
+    	AbstractApplicationContext result = new ServletApplicationContext(servletContext);
+    	result.register(new SpringResourceLocator(new ServletContextResourcePatternResolver(servletContext)));
+    	return result;
     }
 
     /** {@inheritDoc} */

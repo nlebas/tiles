@@ -62,6 +62,11 @@
          <artifactId>tiles-request-portlet</artifactId>
          <version>${tiles.request.version}</version>
       </dependency>
+      <dependency>
+         <groupId>org.apache.tiles</groupId>
+         <artifactId>tiles-request-spring</artifactId>
+         <version>${tiles.request.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>

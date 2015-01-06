@@ -27,11 +27,15 @@ import java.util.List;
 import javax.servlet.ServletContext;
 
 import org.apache.tiles.extras.complete.CompleteAutoloadTilesInitializer;
+import org.apache.tiles.request.AbstractApplicationContext;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.ApplicationResource;
+import org.apache.tiles.request.locale.ClasspathResourceLocator;
 import org.apache.tiles.request.render.Renderer;
-import org.apache.tiles.request.servlet.wildcard.WildcardServletApplicationContext;
+import org.apache.tiles.request.servlet.ServletApplicationContext;
+import org.apache.tiles.request.spring.SpringResourceLocator;
 import org.apache.tiles.test.renderer.ReverseStringRenderer;
+import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 
 /**
  * Test Tiles initializer for Tiles initialization of the default container.
@@ -57,10 +61,12 @@ public class TestTilesInitializer extends CompleteAutoloadTilesInitializer {
     
     /** {@inheritDoc} */
     @Override
-    protected ApplicationContext createTilesApplicationContext(
-            ApplicationContext preliminaryContext) {
-        return new WildcardServletApplicationContext(
-                (ServletContext) preliminaryContext.getContext());
+    protected ApplicationContext createTilesApplicationContext(ApplicationContext preliminaryContext) {
+        ServletContext servletContext = (ServletContext) preliminaryContext.getContext();
+        AbstractApplicationContext result = new ServletApplicationContext(servletContext);
+        result.register(new SpringResourceLocator(new ServletContextResourcePatternResolver(servletContext)));
+        result.register(new ClasspathResourceLocator());
+        return result;
     }
 
     @Override

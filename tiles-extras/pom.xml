@@ -67,7 +67,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.tiles</groupId>
-      <artifactId>tiles-request-servlet-wildcard</artifactId>
+      <artifactId>tiles-request-spring</artifactId>
       <version>${tiles.request.version}</version>
     </dependency>
     <dependency>
@@ -109,6 +109,11 @@
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-compat</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>3.2.0.RELEASE</version>
     </dependency>
 
     <dependency>

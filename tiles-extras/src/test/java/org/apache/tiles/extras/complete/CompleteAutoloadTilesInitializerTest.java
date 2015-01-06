@@ -21,8 +21,14 @@
 
 package org.apache.tiles.extras.complete;
 
-import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -51,7 +57,6 @@ import org.apache.tiles.request.freemarker.render.FreemarkerRenderer;
 import org.apache.tiles.request.mustache.MustacheRenderer;
 import org.apache.tiles.request.render.DispatchRenderer;
 import org.apache.tiles.request.servlet.ServletApplicationContext;
-import org.apache.tiles.request.servlet.wildcard.WildcardServletApplicationContext;
 import org.apache.tiles.request.velocity.render.VelocityRenderer;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -89,7 +94,7 @@ public class CompleteAutoloadTilesInitializerTest {
 
         replay(preliminaryContext, servletContext);
         assertTrue(initializer
-                .createTilesApplicationContext(preliminaryContext) instanceof WildcardServletApplicationContext);
+                .createTilesApplicationContext(preliminaryContext) instanceof ServletApplicationContext);
         verify(preliminaryContext, servletContext);
     }
 
