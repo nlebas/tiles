@@ -32,6 +32,7 @@ import org.apache.tiles.TilesContainer;
 import org.apache.tiles.access.TilesAccess;
 import org.apache.tiles.request.Request;
 import org.apache.tiles.request.servlet.ServletUtil;
+import org.apache.tiles.request.servlet.ServletRequest;
 import org.apache.tiles.request.velocity.VelocityRequest;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.Renderable;
@@ -240,8 +241,8 @@ public class VelocityStyleTilesTool extends ContextHolder {
      */
     protected Request createVelocityRequest(
             ServletContext servletContext, Writer writer) {
-        return VelocityRequest.createVelocityRequest(ServletUtil
+        return new VelocityRequest(new ServletRequest(ServletUtil
                 .getApplicationContext(servletContext), getRequest(),
-                getResponse(), getVelocityContext(), writer);
+                getResponse()), getVelocityContext(), writer);
     }
 }

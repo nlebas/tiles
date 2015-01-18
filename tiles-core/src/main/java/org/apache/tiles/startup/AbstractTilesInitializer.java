@@ -131,12 +131,12 @@ public abstract class AbstractTilesInitializer implements TilesInitializer {
      */
     protected void populateContainer(BasicTilesContainer tilesContainer) {
         tilesContainer.setApplicationContext(applicationContext);
-        tilesContainer.setAttributeEvaluatorFactory(createAttributeEvaluatorFactory(applicationContext));
-        tilesContainer.setDefinitionsFactory(createDefinitionsFactory(applicationContext));
-        tilesContainer.setPreparerFactory(createPreparerFactory(applicationContext));
         BasicRendererFactory rendererFactory = new BasicRendererFactory();
         tilesContainer.setRendererFactory(rendererFactory);
         populateRendererFactory(rendererFactory);
+        tilesContainer.setAttributeEvaluatorFactory(createAttributeEvaluatorFactory(applicationContext));
+        tilesContainer.setDefinitionsFactory(createDefinitionsFactory(applicationContext));
+        tilesContainer.setPreparerFactory(createPreparerFactory(applicationContext));
     }
 
     protected void registerContainer(TilesContainer tilesContainer) {

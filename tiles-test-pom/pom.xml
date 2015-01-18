@@ -36,6 +36,7 @@
     <module>tiles-test-common</module>
     <module>tiles-test-alt</module>
     <module>tiles-test-db</module>
+    <module>tiles-test-velocity</module>
   	<module>tiles-test</module>
   </modules>
 </project>

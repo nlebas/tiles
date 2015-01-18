@@ -23,7 +23,9 @@ package org.apache.tiles.test.renderer;
 import java.io.IOException;
 
 import org.apache.tiles.request.Request;
+import org.apache.tiles.request.render.BasicRendererFactory;
 import org.apache.tiles.request.render.Renderer;
+import org.apache.tiles.request.render.RendererFactory;
 
 /**
  * A simple test <code>AttributeRenderer</code>.
@@ -32,6 +34,13 @@ import org.apache.tiles.request.render.Renderer;
  */
 public class ReverseStringRenderer implements Renderer {
 
+    public ReverseStringRenderer() {
+    }
+    
+    public ReverseStringRenderer(RendererFactory factory) {
+        ((BasicRendererFactory)factory).registerRenderer("reversed", this);
+    }
+    
     /** {@inheritDoc} */
     @Override
     public void render(String value, Request request) throws IOException {

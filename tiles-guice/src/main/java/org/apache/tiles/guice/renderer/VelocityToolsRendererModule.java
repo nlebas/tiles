@@ -21,12 +21,13 @@
 
 package org.apache.tiles.guice.renderer;
 
+import java.util.Map.Entry;
 import java.util.Properties;
 
-import org.apache.tiles.factory.TilesContainerFactoryException;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.render.Renderer;
 import org.apache.tiles.request.velocity.render.VelocityToolsRenderer;
+import org.apache.tiles.startup.TilesInitializerException;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.google.inject.AbstractModule;
@@ -42,7 +43,7 @@ import com.google.inject.multibindings.MapBinder;
  * @since 3.1.0
  */
 
-public class VelocityRendererModule extends AbstractModule {
+public class VelocityToolsRendererModule extends AbstractModule {
 
     @Override
     protected void configure() {
@@ -69,11 +70,16 @@ public class VelocityRendererModule extends AbstractModule {
     @Singleton
     public VelocityEngine createVelocityEngine(ApplicationContext applicationContext) {
         try {
+            VelocityEngine velocityEngine = new VelocityEngine();
+            for(Entry<String, Object> attr: applicationContext.getApplicationScope().entrySet()) {
+                velocityEngine.setApplicationAttribute(attr.getKey(), attr.getValue());
+            }
             Properties velocityProperties = new Properties();
             velocityProperties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/velocity.properties"));
-            return new VelocityEngine(velocityProperties);
+            velocityEngine.init(velocityProperties);
+            return velocityEngine;
         } catch (Exception e) {
-            throw new TilesContainerFactoryException("Cannot initialize Velocity renderer", e);
+            throw new TilesInitializerException("Cannot initialize Velocity renderer", e);
         }
     }
 }

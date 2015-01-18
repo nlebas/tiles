@@ -21,12 +21,12 @@
 
 package org.apache.tiles.guice.renderer;
 
-import org.apache.tiles.factory.TilesContainerFactoryException;
 import org.apache.tiles.freemarker.template.TilesFMModelRepository;
 import org.apache.tiles.request.ApplicationContext;
 import org.apache.tiles.request.freemarker.RequestTemplateLoader;
 import org.apache.tiles.request.freemarker.render.FreemarkerRenderer;
 import org.apache.tiles.request.render.Renderer;
+import org.apache.tiles.startup.TilesInitializerException;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -91,7 +91,7 @@ public class FreemarkerRendererModule extends AbstractModule {
             config.setSharedVariable("tiles", new TilesFMModelRepository());
             return config;
         } catch (TemplateException e) {
-            throw new TilesContainerFactoryException("Cannot initialize Freemarker renderer", e);
+            throw new TilesInitializerException("Cannot initialize Freemarker renderer", e);
         }
     }
 }

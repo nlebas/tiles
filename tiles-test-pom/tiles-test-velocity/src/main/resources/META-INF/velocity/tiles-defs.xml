@@ -208,28 +208,28 @@
   </definition>
 
   <definition name="velocity.test.composite.el.definition" templateExpression="${layout}"
-        preparer="org.apache.tiles.test.preparer.RequestSettingViewPreparer">
+        preparer="org.apache.tiles.test.velocity.RequestSettingViewPreparer">
       <put-attribute name="title"  value="This is a configured composite definition."/>
       <put-attribute name="header" value="/velocity/header.vm" type="velocity" />
       <put-attribute name="body"   expression="${requestScope.body}"/>
   </definition>
 
   <definition name="velocity.test.composite.mvel.definition" templateExpression="MVEL:layout"
-        preparer="org.apache.tiles.test.preparer.RequestSettingViewPreparer">
+        preparer="org.apache.tiles.test.velocity.RequestSettingViewPreparer">
       <put-attribute name="title"  value="This is a configured composite definition."/>
       <put-attribute name="header" value="/velocity/header.vm" type="velocity" />
       <put-attribute name="body"   expression="MVEL:requestScope.body"/>
   </definition>
 
   <definition name="velocity.test.composite.ognl.definition" templateExpression="OGNL:layout"
-        preparer="org.apache.tiles.test.preparer.RequestSettingViewPreparer">
+        preparer="org.apache.tiles.test.velocity.RequestSettingViewPreparer">
       <put-attribute name="title"  value="This is a configured composite definition."/>
       <put-attribute name="header" value="/velocity/header.vm" type="velocity" />
       <put-attribute name="body"   expression="OGNL:requestScope.body"/>
   </definition>
 
   <definition name="velocity.test.composite.el.doNotShow.definition" templateExpression="${layout}"
-        preparer="org.apache.tiles.test.preparer.RequestSettingViewPreparer">
+        preparer="org.apache.tiles.test.velocity.RequestSettingViewPreparer">
       <put-attribute name="title"  value="This is a configured definition."/>
       <put-attribute name="header" value="/velocity/header.vm" type="velocity" />
       <put-attribute name="body"   expression="${requestScope.doNotShowBody}"/>
