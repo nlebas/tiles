@@ -21,25 +21,52 @@
 
 package org.apache.tiles.test.alt;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import javax.servlet.ServletContext;
 
-import org.apache.tiles.factory.AbstractTilesContainerFactory;
+import org.apache.tiles.definition.dao.CachingLocaleUrlDefinitionDAO;
+import org.apache.tiles.definition.dao.DefinitionDAO;
+import org.apache.tiles.request.AbstractApplicationContext;
 import org.apache.tiles.request.ApplicationContext;
-import org.apache.tiles.request.servlet.wildcard.WildcardServletApplicationContext;
-import org.apache.tiles.startup.AbstractTilesInitializer;
+import org.apache.tiles.request.ApplicationResource;
+import org.apache.tiles.request.servlet.ServletApplicationContext;
+import org.apache.tiles.request.spring.SpringResourceLocator;
+import org.apache.tiles.test.factory.TestTilesInitializer;
+import org.springframework.web.context.support.ServletContextResourcePatternResolver;
 
 /**
  * Test Tiles initializer for Tiles initialization of the alternate container.
  *
  * @version $Rev$ $Date$
  */
-public class TestAlternateTilesInitializer extends AbstractTilesInitializer {
+public class TestAlternateTilesInitializer extends TestTilesInitializer {
+
+    /**
+     * The number of URLs to load..
+     */
+    private static final int URL_COUNT = 3;
 
     /** {@inheritDoc} */
     @Override
-    protected AbstractTilesContainerFactory createContainerFactory(
-            ApplicationContext context) {
-        return new TestAlternateTilesContainerFactory();
+    protected List<ApplicationResource> getSources(ApplicationContext applicationContext) {
+        List<ApplicationResource> urls = new ArrayList<ApplicationResource>(URL_COUNT);
+        urls.add(applicationContext.getResource("classpath:/org/apache/tiles/test/alt/defs/tiles-alt-defs.xml"));
+        urls.add(applicationContext.getResource("classpath:/org/apache/tiles/test/alt/defs/tiles-alt-freemarker-defs.xml"));
+        urls.add(applicationContext.getResource("classpath:/org/apache/tiles/test/alt/defs/tiles-alt-velocity-defs.xml"));
+        return urls;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DefinitionDAO<Locale> createLocaleDefinitionDao(ApplicationContext applicationContext) {
+        CachingLocaleUrlDefinitionDAO definitionDao = new CachingLocaleUrlDefinitionDAO(applicationContext);
+        definitionDao.setReader(createDefinitionsReader(applicationContext));
+        definitionDao.setSources(getSources(applicationContext));
+        definitionDao.setPatternDefinitionResolver(createPatternDefinitionResolver(Locale.class));
+        return definitionDao;
     }
 
     /** {@inheritDoc} */
@@ -53,7 +80,9 @@ public class TestAlternateTilesInitializer extends AbstractTilesInitializer {
     @Override
     protected ApplicationContext createTilesApplicationContext(
             ApplicationContext preliminaryContext) {
-        return new WildcardServletApplicationContext(
-                (ServletContext) preliminaryContext.getContext());
+        ServletContext servletContext = (ServletContext) preliminaryContext.getContext();
+        AbstractApplicationContext result = new ServletApplicationContext(servletContext);
+        result.register(new SpringResourceLocator(new ServletContextResourcePatternResolver(servletContext)));
+        return result;
     }
 }

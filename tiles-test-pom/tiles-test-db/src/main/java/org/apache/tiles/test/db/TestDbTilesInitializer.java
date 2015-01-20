@@ -21,28 +21,45 @@
 
 package org.apache.tiles.test.db;
 
-import org.apache.tiles.factory.AbstractTilesContainerFactory;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
+import org.apache.tiles.definition.DefinitionsFactory;
+import org.apache.tiles.definition.LocaleDefinitionsFactory;
+import org.apache.tiles.definition.dao.DefinitionDAO;
+import org.apache.tiles.locale.impl.DefaultLocaleResolver;
 import org.apache.tiles.request.ApplicationContext;
-import org.apache.tiles.startup.AbstractTilesInitializer;
+import org.apache.tiles.startup.DefaultTilesInitializer;
 
 /**
  * Test Tiles initializer for Tiles initialization of the db-based container.
  *
  * @version $Rev$ $Date$
  */
-public class TestDbTilesInitializer extends AbstractTilesInitializer {
-
-    /** {@inheritDoc} */
-    @Override
-    protected AbstractTilesContainerFactory createContainerFactory(
-            ApplicationContext context) {
-        return new TestDbTilesContainerFactory();
-    }
+public class TestDbTilesInitializer extends DefaultTilesInitializer {
 
     /** {@inheritDoc} */
     @Override
     protected String getContainerKey(
             ApplicationContext applicationContext) {
         return "db";
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected DefinitionDAO<Locale> createLocaleDefinitionDao(ApplicationContext applicationContext) {
+        LocaleDbDefinitionDAO definitionDao = new LocaleDbDefinitionDAO();
+        definitionDao.setDataSource((DataSource) applicationContext
+                .getApplicationScope().get("dataSource"));
+        return definitionDao;
+    }
+
+    @Override
+    protected DefinitionsFactory createDefinitionsFactory(ApplicationContext applicationContext) {
+        LocaleDefinitionsFactory factory = new LocaleDefinitionsFactory();
+        factory.setLocaleResolver(new DefaultLocaleResolver());
+        factory.setDefinitionDAO(createLocaleDefinitionDao(applicationContext));
+        return factory;
     }
 }

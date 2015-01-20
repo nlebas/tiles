@@ -60,6 +60,8 @@
         <module>tiles-compat</module>
         <module>tiles-spring</module>
         <module>tiles-extras</module>
+        <module>tiles-cdi</module>
+        <module>tiles-guice</module>
         <module>assembly</module>
         <module>tiles-test-pom</module>
     </modules>

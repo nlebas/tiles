@@ -23,6 +23,7 @@ package org.apache.tiles.locale.impl;
 import static org.easymock.classextension.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 
@@ -46,6 +47,7 @@ public class DefaultLocaleResolverTest {
         Map<String, Object> sessionScope = createMock(Map.class);
         Locale locale = Locale.ITALY;
 
+        expect(request.getAvailableScopes()).andReturn(Arrays.asList("request", "session", "application"));
         expect(request.getContext("session")).andReturn(sessionScope);
         expect(sessionScope.get(DefaultLocaleResolver.LOCALE_KEY)).andReturn(null);
         expect(request.getRequestLocale()).andReturn(locale);

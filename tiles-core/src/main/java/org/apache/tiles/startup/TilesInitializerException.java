@@ -18,38 +18,55 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.tiles.factory;
+package org.apache.tiles.startup;
 
-import org.apache.tiles.TilesContainer;
-import org.apache.tiles.request.ApplicationContext;
+import org.apache.tiles.TilesException;
 
 /**
- * Abstract Factory that creates instances of {@link TilesContainerFactory}.
+ * Indicates that something went wrong in {@link TilesContainerFactory} use.
  *
  * @version $Rev$ $Date$
- * @since 2.1.0
- * @deprecated use AbstractTilesInitializer instead
+ * @since 3.1.0
  */
-@Deprecated
-public abstract class AbstractTilesContainerFactory {
+public class TilesInitializerException extends TilesException {
 
     /**
-     * Initialization parameter that represents the container factory class
-     * name.
+     * Constructor.
      *
      * @since 2.1.0
      */
-    public static final String CONTAINER_FACTORY_INIT_PARAM =
-        "org.apache.tiles.factory.AbstractTilesContainerFactory";
+    public TilesInitializerException() {
+    }
 
     /**
-     * Creates a Tiles container.
+     * Constructor.
      *
-     * @param applicationContext The Tiles application context object.
-     * @return The created container.
-     * @throws TilesContainerFactoryException If something goes wrong during
-     * instantiation.
-     * @since 2.1.1
+     * @param message The detail message.
+     * @since 2.1.0
      */
-    public abstract TilesContainer createContainer(ApplicationContext applicationContext);
+    public TilesInitializerException(String message) {
+        super(message);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param e The exception to be wrapped.
+     * @since 2.1.0
+     */
+    public TilesInitializerException(Throwable e) {
+        super(e);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param message The detail message.
+     * @param e The exception to be wrapped.
+     * @since 2.1.0
+     */
+    public TilesInitializerException(String message, Throwable e) {
+        super(message, e);
+    }
+
 }

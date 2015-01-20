@@ -30,125 +30,89 @@
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>tiles-extras</artifactId>
+  <groupId>org.apache.tiles</groupId>
+  <artifactId>tiles-cdi</artifactId>
   <packaging>jar</packaging>
-  <name>Tiles - Extras</name>
-  <description>Extras for Tiles, including non-standard, non-generic, non-identifiable components that may be useful for Tiles users.
+  <name>Tiles - CDI-based configuration</name>
+  <description>Tiles CDI-based configuration
   </description>
 
   <properties>
-  	<tiles.osgi.symbolicName>org.apache.tiles.extras</tiles.osgi.symbolicName>
+      <tiles.osgi.symbolicName>org.apache.tiles.cdi</tiles.osgi.symbolicName>
   </properties>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>LICENSE.txt</exclude>
-          <exclude>NOTICE.txt</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>LICENSE.txt</include>
-          <include>NOTICE.txt</include>
-        </includes>
-        <targetPath>META-INF</targetPath>
-      </resource>
-    </resources>
-  </build>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.tiles</groupId>
-      <artifactId>tiles-request-spring</artifactId>
-      <version>${tiles.request.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tiles</groupId>
-      <artifactId>tiles-request-mustache</artifactId>
-      <version>${tiles.request.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tiles</groupId>
-      <artifactId>tiles-jsp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-freemarker</artifactId>
       <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-velocity</artifactId>
       <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
+
     <dependency>
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-el</artifactId>
       <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.apache.tiles</groupId>
-      <artifactId>tiles-mvel</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tiles</groupId>
-      <artifactId>tiles-ognl</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+
     <dependency>
       <groupId>org.apache.tiles</groupId>
       <artifactId>tiles-compat</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <version>3.2.0.RELEASE</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
-      <artifactId>guava</artifactId>
-      <groupId>com.google.guava</groupId>
-      <version>12.0.1</version>
+      <groupId>org.apache.tiles</groupId>
+      <artifactId>tiles-mvel</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tiles</groupId>
+      <artifactId>tiles-ognl</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet.jsp</groupId>
       <artifactId>jsp-api</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
-      <scope>test</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-      <scope>test</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -164,9 +128,22 @@
     </dependency>
 
     <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymockclassextension</artifactId>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <version>1.0</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.apache.openwebbeans</groupId>
+      <artifactId>openwebbeans-impl</artifactId>
+      <version>1.1.5</version>
       <scope>test</scope>
-    </dependency>
+    </dependency>    
+    <dependency>
+      <groupId>org.jboss.weld</groupId>
+      <artifactId>weld-core</artifactId>
+      <version>1.1.9.Final</version>
+      <scope>test</scope>
+    </dependency>    
   </dependencies>
+
 </project>

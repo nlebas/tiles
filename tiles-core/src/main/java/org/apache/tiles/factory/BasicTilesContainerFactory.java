@@ -59,7 +59,9 @@ import org.apache.tiles.request.render.StringRenderer;
  *
  * @version $Rev$ $Date$
  * @since 2.1.0
+ * @deprecated use DefaultTilesInitializer instead.
  */
+@Deprecated
 public class BasicTilesContainerFactory extends AbstractTilesContainerFactory {
 
     /**
