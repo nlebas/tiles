@@ -1,3 +1,4 @@
+<#--
 /*
  * $Id$
  *
@@ -17,23 +18,7 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
-
-package org.apache.tiles.guice.definition;
-
-
-/**
  *
- * @version $Rev$ $Date$
- * @since 3.0.0
  */
-
-public class DefaultDefinitionsFactoryModule extends DefinitionsFactoryModule {
-
-    /**
-     */
-    public DefaultDefinitionsFactoryModule() {
-        super("/WEB-INF/tiles.xml");
-    }
-
-}
+-->
+<div align="center"><b><i>This is a body</i></b></div>

@@ -20,9 +20,6 @@
  */
 package org.apache.tiles.preparer.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.tiles.preparer.ViewPreparer;
 import org.apache.tiles.request.Request;
 import org.apache.tiles.request.reflect.ClassUtil;
@@ -37,26 +34,13 @@ import org.slf4j.LoggerFactory;
  * @since Tiles 2.0
  * @version $Rev$ $Date$
  */
-public class BasicPreparerFactory implements PreparerFactory {
+public class BasicPreparerFactory extends MapPreparerFactory {
 
     /**
      * The logging object.
      */
     private final Logger log = LoggerFactory
             .getLogger(BasicPreparerFactory.class);
-
-    /**
-     * Maps a preparer name to the instantiated preparer.
-     */
-    protected Map<String, ViewPreparer> preparers;
-
-    /**
-     * Constructor.
-     */
-    public BasicPreparerFactory() {
-        this.preparers = new HashMap<String, ViewPreparer>();
-    }
-
 
     /**
      * Create a new instance of the named preparerInstance.  This factory
@@ -66,13 +50,17 @@ public class BasicPreparerFactory implements PreparerFactory {
      * @param context current context
      * @return ViewPreparer instance
      */
+    @Override
     public ViewPreparer getPreparer(String name, Request context) {
 
-        if (!preparers.containsKey(name)) {
-            preparers.put(name, createPreparer(name));
+        if (super.getPreparer(name, context) == null) {
+            ViewPreparer newInstance = createPreparer(name);
+            if(newInstance != null) {
+            	register(name, newInstance);
+            }
         }
 
-        return preparers.get(name);
+        return super.getPreparer(name, context);
     }
 
     /**

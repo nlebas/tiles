@@ -90,20 +90,6 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet.jsp</groupId>
-      <artifactId>jsp-api</artifactId>
-      <scope>provided</scope>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <optional>true</optional>
@@ -122,6 +108,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.tiles</groupId>
+      <artifactId>tiles-request-basic</artifactId>
+      <version>${tiles.request.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <scope>test</scope>
@@ -130,20 +123,15 @@
     <dependency>
       <groupId>javax.enterprise</groupId>
       <artifactId>cdi-api</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
+      <scope>provided</scope>
     </dependency>    
     <dependency>
-      <groupId>org.apache.openwebbeans</groupId>
-      <artifactId>openwebbeans-impl</artifactId>
-      <version>1.1.5</version>
-      <scope>test</scope>
-    </dependency>    
-    <dependency>
-      <groupId>org.jboss.weld</groupId>
-      <artifactId>weld-core</artifactId>
-      <version>1.1.9.Final</version>
-      <scope>test</scope>
-    </dependency>    
+	  <groupId>org.jglue.cdi-unit</groupId>
+	  <artifactId>cdi-unit</artifactId>
+	  <version>3.0.0</version>
+        <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>

@@ -104,6 +104,13 @@
     </dependency>
 
     <dependency>
+    	<groupId>org.apache.tiles</groupId>
+    	<artifactId>tiles-request-basic</artifactId>
+    	<version>${tiles.request.version}</version>
+    	<scope>test</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <optional>true</optional>
@@ -138,6 +145,12 @@
         <version>3.0</version>
     </dependency>
     
+	<dependency>
+	    <groupId>org.jukito</groupId>
+	    <artifactId>jukito</artifactId>
+	    <version>1.4.1</version>
+	    <scope>test</scope>
+	</dependency>
   </dependencies>
 
 </project>

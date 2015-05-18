@@ -92,13 +92,15 @@ public abstract class BaseLocaleUrlDefinitionDAO implements
         lastModifiedDates = new HashMap<String, Long>();
     }
 
-    public void setSources(List<ApplicationResource> sources) {
+    public void setSources(Iterable<ApplicationResource> sources) {
         // filter out any sources that are already localized
         ArrayList<ApplicationResource> defaultSources = new ArrayList<ApplicationResource>();
         for(ApplicationResource source: sources) {
-            if(Locale.ROOT.equals(source.getLocale())) {
-                defaultSources.add(source);
-            }
+        	if(source != null) {
+	            if(Locale.ROOT.equals(source.getLocale())) {
+	                defaultSources.add(source);
+	            }
+        	}
         }
         this.sources = defaultSources;
     }

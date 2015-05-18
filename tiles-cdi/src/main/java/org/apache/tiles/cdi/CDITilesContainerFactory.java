@@ -22,7 +22,6 @@ import org.apache.tiles.request.render.Renderer;
 import org.apache.tiles.request.render.StringRenderer;
 
 @Singleton
-
 public class CDITilesContainerFactory extends AbstractTilesContainerFactory {
 
     private static final String STRING_RENDERER_NAME = "string";
