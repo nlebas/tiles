@@ -24,22 +24,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>tiles-parent</artifactId>
+    <artifactId>tiles-test-pom</artifactId>
     <groupId>org.apache.tiles</groupId>
     <version>3.1-SNAPSHOT</version>
   </parent>
-  <artifactId>tiles-test-pom</artifactId>
-  <packaging>pom</packaging>
-  <name>Tiles test webapp module collector</name>
-  <description>Collects all the modules of the Tiles test web application.</description>
-  <modules>
-    <module>tiles-test-common</module>
-    <module>tiles-test-jsp</module>
-    <module>tiles-test-alt</module>
-    <module>tiles-test-db</module>
-    <module>tiles-test-velocity</module>
-    <module>tiles-test-freemarker</module>
-    <module>tiles-test-selenium</module>
-    <module>tiles-test</module>
-  </modules>
+  <artifactId>tiles-test-selenium</artifactId>
+  <name>Tiles - Selenium Test Suite</name>
+  <description>Selenium Test Suite</description>
+
 </project>

@@ -59,6 +59,13 @@
       </dependency>
       <dependency>
          <groupId>org.apache.tiles</groupId>
+         <artifactId>tiles-test-jsp</artifactId>
+         <version>${project.version}</version>
+         <type>war</type>
+         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.tiles</groupId>
          <artifactId>tiles-test-freemarker</artifactId>
          <version>${project.version}</version>
       </dependency>
@@ -66,6 +73,12 @@
          <groupId>org.apache.tiles</groupId>
          <artifactId>tiles-extras</artifactId>
          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+         <groupId>org.apache.tiles</groupId>
+         <artifactId>tiles-test-selenium</artifactId>
+         <version>${project.version}</version>
+         <scope>provided</scope>
       </dependency>
       <dependency>
          <groupId>org.apache.tiles</groupId>
@@ -169,6 +182,11 @@
                           <Tiles-Initializer>org.apache.tiles.test.factory.TestTilesInitializer</Tiles-Initializer>
                       </manifestEntries>
                   </archive>
+                  <overlay>
+                  	<id>jsp</id>
+                  	<groupId>org.apache.tiles</groupId>
+                  	<artifactId>tiles-test-jsp</artifactId>
+                  </overlay>
                </configuration>
            </plugin>
            <plugin>
@@ -188,10 +206,10 @@
 
     <profiles>
         <profile>
-            <id>selenium</id>
+            <id>run-selenium</id>
             <activation>
                 <property>
-                    <name>selenium</name>
+                    <name>run-selenium</name>
                 </property>
             </activation>
             <build>
@@ -201,65 +219,24 @@
                         <artifactId>dependency-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>unpack-selenium</id>
-                                <phase>generate-resources</phase>
+                                <id>unpack-tests</id>
+                                <phase>pre-integration-test</phase>
                                 <goals>
                                     <goal>unpack</goal>
                                 </goals>
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>org.openqa.selenium.core</groupId>
-                                            <artifactId>selenium-core</artifactId>
-                                            <version>1.0-beta-1</version>
+                                            <groupId>org.apache.tiles</groupId>
+                                            <artifactId>tiles-test-selenium</artifactId>
+                                            <version>${project.version}</version>
                                         </artifactItem>
                                     </artifactItems>
-                                    <outputDirectory>${project.build.directory}/selenium</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/selenium/tests</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-selenium</id>
-                                <phase>process-resources</phase>
-                                <configuration>
-                                    <tasks>
-                                        <copy todir="${project.build.directory}/${project.artifactId}/selenium/core">
-                                            <fileset dir="${project.build.directory}/selenium/core" />
-                                        </copy>
-                                        <copy todir="${project.build.directory}/${project.artifactId}/selenium/tests">
-                                            <fileset dir="src/test/selenium" />
-                                        </copy>
-                                    </tasks>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <repositories>
-                <repository>
-                    <id>OpenQA</id>
-                    <url>http://nexus.openqa.org/content/repositories/releases/</url>
-                </repository>
-            </repositories>
-        </profile>
-
-        <profile>
-            <id>run-selenium</id>
-            <activation>
-                <property>
-                    <name>run-selenium</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
                     <plugin>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-maven2-plugin</artifactId>
@@ -301,7 +278,7 @@
                                     <background>true</background>
                                     <browser>*googlechrome</browser>
                                     <startURL>http://localhost:8080/tiles-test/</startURL>
-                                    <suite>src/test/selenium/TestSuite.html</suite>
+                                    <suite>${project.build.directory}/selenium/tests/TestSuite.html</suite>
                                 </configuration>
                             </execution>
                         </executions>
@@ -330,75 +307,6 @@
             </build>
         </profile>
 
-        <profile>
-            <id>hostedqa</id>
-            <dependencies>
-                <dependency>
-                    <groupId>com.hostedqa</groupId>
-                    <artifactId>hostedqa-remote-ant</artifactId>
-                    <version>1.6.2</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <repositories>
-                <repository>
-                    <id>codehaus</id>
-                    <name>codehaus</name>
-                    <url>http://repository.codehaus.org</url>
-                </repository>
-                <repository>
-                    <id>maven-hostedqa</id>
-                    <name>maven-hostedqa</name>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>always</updatePolicy>
-                        <checksumPolicy>ignore</checksumPolicy>
-                    </snapshots>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <url>http://maven.hostedqa.com</url>
-                </repository>
-            </repositories>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <taskdef resource="hostedqatasks" classpathref="maven.plugin.classpath" />
-                                        <upload file="${project.build.directory}/${project.build.finalName}.war" account="tiles" email="${tiles.hostedqa.email}" password="${tiles.hostedqa.password}" resourceId="${hostedqa.resourceId}" />
-
-                                        <playsuite clientConfigs="${hostedqa.clientConfigs}" appConfigs="${hostedqa.appConfigs}" account="tiles" email="${tiles.hostedqa.email}" password="${tiles.hostedqa.password}">
-                                            <fileSet dir="${basedir}/src/test/selenium" excludes="TestSuite.html" />
-                                        </playsuite>
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                        <dependencies>
-                            <dependency>
-                                <groupId>com.hostedqa</groupId>
-                                <artifactId>hostedqa-remote-ant</artifactId>
-                                <version>1.6.2</version>
-                            </dependency>
-                        </dependencies>
-                    </plugin>
-                </plugins>
-            </build>
-            <properties>
-                <hostedqa.resourceId>53</hostedqa.resourceId>
-                <hostedqa.clientConfigs>303</hostedqa.clientConfigs>
-                <hostedqa.appConfigs>121</hostedqa.appConfigs>
-            </properties>
-        </profile>
         <profile>
             <id>apache-release</id>
             <build>
@@ -456,24 +364,4 @@
             </build>
         </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>codehaus</id>
-            <name>codehaus</name>
-            <url>http://repository.codehaus.org</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>codehaus</id>
-            <name>codehaus</name>
-            <url>http://repository.codehaus.org</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </pluginRepository>
-    </pluginRepositories>
 </project>
