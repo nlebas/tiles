@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<!--
+<#--
 /*
  * $Id$
  *
@@ -19,19 +18,14 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+ *
  */
 -->
-
-<!DOCTYPE tiles-definitions PUBLIC
-    "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
-    "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
-
-<!-- Definitions for Tiles documentation   -->
-
-<tiles-definitions>
-    <definition name="freemarker.classpath.definition" template="/ftl/layout.ftl">
-        <put-attribute name="title" value="This is the title."/>
-        <put-attribute name="header" value="/ftl/header.ftl"/>
-        <put-attribute name="body" value="/ftl/classpath.ftl"/>
-    </definition>
-</tiles-definitions>
+<@tiles.insertTemplate template="/ftl/putattributeslayout.ftl">
+  <@tiles.putAttribute name="stringTest" value="This is a string" type="string" />
+  <@tiles.putListAttribute name="list">
+    <@tiles.addAttribute value="valueOne" type="string" />
+    <@tiles.addAttribute value="valueTwo" type="string" />
+    <@tiles.addAttribute value="valueThree" type="string" />
+  </@tiles.putListAttribute>
+</@tiles.insertTemplate>

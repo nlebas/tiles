@@ -27,24 +27,24 @@
        "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
 
 <tiles-definitions>
-  <definition name="freemarker.test.definition" template="/freemarker/layout.ftl">
+  <definition name="freemarker.test.definition" template="/ftl/layout.ftl">
       <put-attribute name="title"  value="This definition is from an alternate container."/>
-      <put-attribute name="header" value="/freemarker/header.ftl"/>
-      <put-attribute name="body"   value="/freemarker/body.ftl"/>
+      <put-attribute name="header" value="/ftl/header.ftl"/>
+      <put-attribute name="body"   value="/ftl/body.ftl"/>
   </definition>
-  <definition name="freemarker.test.definition.alt" template="/freemarker/layout.ftl">
+  <definition name="freemarker.test.definition.alt" template="/ftl/layout.ftl">
       <put-attribute name="title"  value="This definition is from an alternate container."/>
-      <put-attribute name="header" value="/freemarker/header.ftl"/>
+      <put-attribute name="header" value="/ftl/header.ftl"/>
       <put-attribute name="body"   value="/org/apache/tiles/test/alt/freemarker/body.ftl"/>
   </definition>
-  <definition name="WILDCARD:freemarker.test.definition*.message*" template="/freemarker/layout{1}.ftl">
+  <definition name="WILDCARD:freemarker.test.definition*.message*" template="/ftl/layout{1}.ftl">
       <put-attribute name="title"  value="This definition has a message: {2}."/>
-      <put-attribute name="header" value="/freemarker/header.ftl"/>
-      <put-attribute name="body"   value="/freemarker/body.ftl"/>
+      <put-attribute name="header" value="/ftl/header.ftl"/>
+      <put-attribute name="body"   value="/ftl/body.ftl"/>
   </definition>
-  <definition name="REGEXP:freemarker\.test\.regexp\.definition(.*)\.message(.*)" template="/freemarker/layout{1}.ftl">
+  <definition name="REGEXP:freemarker\.test\.regexp\.definition(.*)\.message(.*)" template="/ftl/layout{1}.ftl">
       <put-attribute name="title"  value="This definition has a message: {2}."/>
-      <put-attribute name="header" value="/freemarker/header.ftl"/>
-      <put-attribute name="body"   value="/freemarker/body.ftl"/>
+      <put-attribute name="header" value="/ftl/header.ftl"/>
+      <put-attribute name="body"   value="/ftl/body.ftl"/>
   </definition>
 </tiles-definitions>
